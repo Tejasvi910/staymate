@@ -14,6 +14,9 @@ import {
   Sparkles,
   ArrowRight,
   UserCheck,
+  UserPlus,
+  ArrowLeftRight,
+  X,
 } from 'lucide-react';
 
 export const WardenDashboard = () => {
@@ -23,12 +26,30 @@ export const WardenDashboard = () => {
   const [complaints, setComplaints] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Assign Student Modal
+  // Assign Student Modal (from unassigned pool)
   const [showAssignModal, setShowAssignModal] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [studentRoll, setStudentRoll] = useState('');
   const [unassignedStudents, setUnassignedStudents] = useState([]);
   const [isAssigning, setIsAssigning] = useState(false);
+
+  // Admit New Student Modal (Direct Campus Admission)
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [studentName, setStudentName] = useState('');
+  const [studentEmail, setStudentEmail] = useState('');
+  const [studentRollNumber, setStudentRollNumber] = useState('');
+  const [studentContact, setStudentContact] = useState('');
+  const [studentRoomId, setStudentRoomId] = useState('');
+  const [studentTotalFee, setStudentTotalFee] = useState('60000');
+  const [studentPassword, setStudentPassword] = useState('password123');
+  const [isSubmittingStudent, setIsSubmittingStudent] = useState(false);
+
+  // Alter / Reallocate Room Modal
+  const [showReallocateModal, setShowReallocateModal] = useState(false);
+  const [reallocatingResident, setReallocatingResident] = useState(null);
+  const [currentRoomObj, setCurrentRoomObj] = useState(null);
+  const [targetRoomId, setTargetRoomId] = useState('');
+  const [isReallocating, setIsReallocating] = useState(false);
 
   // Add Staff Modal
   const [showAddStaffModal, setShowAddStaffModal] = useState(false);
@@ -137,6 +158,67 @@ export const WardenDashboard = () => {
     }
   };
 
+  // Handle Add Student (Direct Campus Admission by Warden)
+  const handleAddStudent = async (e) => {
+    e.preventDefault();
+    if (!studentName || !studentEmail || !studentRollNumber) return;
+    setIsSubmittingStudent(true);
+    try {
+      const activeCampusId = campusData?._id || user?.campus?._id || user?.campus;
+      await api.post('/users/student', {
+        name: studentName.trim(),
+        email: studentEmail.trim(),
+        rollNumber: studentRollNumber.trim(),
+        campus: activeCampusId,
+        room: studentRoomId || null,
+        contactNumber: studentContact,
+        totalFee: Number(studentTotalFee) || 60000,
+        password: studentPassword || 'password123',
+      });
+      alert(`Student ${studentName} successfully admitted to hostel.`);
+      setShowAddStudentModal(false);
+      setStudentName('');
+      setStudentEmail('');
+      setStudentRollNumber('');
+      setStudentContact('');
+      setStudentRoomId('');
+      fetchWardenData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to admit student');
+    } finally {
+      setIsSubmittingStudent(false);
+    }
+  };
+
+  // Reallocate / Alter Room Handlers
+  const handleOpenReallocateModal = (resident, room) => {
+    setReallocatingResident(resident);
+    setCurrentRoomObj(room);
+    setTargetRoomId('');
+    setShowReallocateModal(true);
+  };
+
+  const handleReallocateRoom = async (e) => {
+    e.preventDefault();
+    if (!reallocatingResident) return;
+    setIsReallocating(true);
+    try {
+      await api.patch('/rooms/reassign', {
+        studentId: reallocatingResident._id,
+        newRoomId: targetRoomId || 'checkout',
+      });
+      alert(`Room assignment updated for ${reallocatingResident.name}.`);
+      setShowReallocateModal(false);
+      setReallocatingResident(null);
+      setCurrentRoomObj(null);
+      fetchWardenData();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to reallocate student');
+    } finally {
+      setIsReallocating(false);
+    }
+  };
+
   const totalCapacity = rooms.reduce((acc, r) => acc + (r.capacity || 0), 0);
   const totalOccupancy = rooms.reduce((acc, r) => acc + (r.currentOccupancy || 0), 0);
   const pendingComplaints = complaints.filter((c) => c.status === 'Pending' || c.status === 'In Progress');
@@ -159,7 +241,14 @@ export const WardenDashboard = () => {
             </p>
           </div>
 
-          <div className="flex flex-wrap gap-2.5">
+          <div className="flex flex-wrap items-center gap-2.5">
+            <button
+              onClick={() => setShowAddStudentModal(true)}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02]"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>+ Admit New Student</span>
+            </button>
             <button
               onClick={() => setShowAddStaffModal(true)}
               className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition"
@@ -299,12 +388,21 @@ export const WardenDashboard = () => {
                 </p>
               </div>
 
-              {unassignedStudents.length > 0 && (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  <span>{unassignedStudents.length} Students Awaiting Room Assignment</span>
-                </span>
-              )}
+              <div className="flex flex-wrap items-center gap-2.5">
+                {unassignedStudents.length > 0 && (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-amber-500/10 text-amber-300 border border-amber-500/20">
+                    <AlertCircle className="w-3.5 h-3.5" />
+                    <span>{unassignedStudents.length} Students Awaiting Room</span>
+                  </span>
+                )}
+                <button
+                  onClick={() => setShowAddStudentModal(true)}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow transition"
+                >
+                  <UserPlus className="w-3.5 h-3.5" />
+                  <span>+ Admit Student</span>
+                </button>
+              </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -348,13 +446,23 @@ export const WardenDashboard = () => {
                                 <div className="font-semibold text-slate-200 truncate">{res.name}</div>
                                 <div className="text-[10px] text-slate-500">{res.rollNumber}</div>
                               </div>
-                              <button
-                                onClick={() => handleUnassignStudent(room._id, res._id)}
-                                title="Unassign Resident"
-                                className="text-[10px] text-rose-400 hover:text-rose-300 underline shrink-0"
-                              >
-                                Remove
-                              </button>
+                              <div className="flex items-center gap-2 shrink-0">
+                                <button
+                                  onClick={() => handleOpenReallocateModal(res, room)}
+                                  title="Alter Room / Reallocate Student"
+                                  className="text-[10px] text-indigo-400 hover:text-indigo-300 font-semibold hover:underline flex items-center gap-0.5"
+                                >
+                                  <ArrowLeftRight className="w-2.5 h-2.5" />
+                                  <span>Alter</span>
+                                </button>
+                                <button
+                                  onClick={() => handleUnassignStudent(room._id, res._id)}
+                                  title="Unassign Resident"
+                                  className="text-[10px] text-rose-400 hover:text-rose-300 underline"
+                                >
+                                  Remove
+                                </button>
+                              </div>
                             </div>
                           ))
                         ) : (
@@ -593,6 +701,211 @@ export const WardenDashboard = () => {
                   className="px-4 py-2 text-xs font-semibold rounded-xl bg-amber-600 hover:bg-amber-500 text-white shadow-lg shadow-amber-600/30"
                 >
                   Save to Roster
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Admit New Student Modal (Warden) */}
+      {showAddStudentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-indigo-600/20 rounded-xl text-indigo-400 border border-indigo-500/30">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Direct Student Admission</h3>
+                  <p className="text-xs text-slate-400">Admit a resident student directly to {campusData?.name || 'this campus'}.</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAddStudentModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleAddStudent} className="space-y-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Rahul Sharma"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Roll / Admission Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 2401530100109"
+                    value={studentRollNumber}
+                    onChange={(e) => setStudentRollNumber(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Campus Email</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="student@campus.edu"
+                    value={studentEmail}
+                    onChange={(e) => setStudentEmail(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Phone Number</label>
+                  <input
+                    type="text"
+                    placeholder="+91 98765 00000"
+                    value={studentContact}
+                    onChange={(e) => setStudentContact(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div className="sm:col-span-2">
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Room Bed Allotment</label>
+                  <select
+                    value={studentRoomId}
+                    onChange={(e) => setStudentRoomId(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value="">Assign Room Later (Awaiting Allotment Pool)</option>
+                    {rooms
+                      .filter((r) => r.currentOccupancy < r.capacity && r.status !== 'maintenance')
+                      .map((r) => (
+                        <option key={r._id} value={r._id}>
+                          Room {r.roomNumber} ({r.block}, Floor {r.floor}) — {r.capacity - r.currentOccupancy} bed(s) available
+                        </option>
+                      ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Annual Fee (INR)</label>
+                  <input
+                    type="number"
+                    placeholder="60000"
+                    value={studentTotalFee}
+                    onChange={(e) => setStudentTotalFee(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Initial Password</label>
+                  <input
+                    type="text"
+                    placeholder="password123"
+                    value={studentPassword}
+                    onChange={(e) => setStudentPassword(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddStudentModal(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingStudent}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 disabled:opacity-50"
+                >
+                  {isSubmittingStudent ? 'Admitting...' : 'Admit Student'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Alter / Reallocate Room Modal */}
+      {showReallocateModal && reallocatingResident && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-indigo-600/20 rounded-xl text-indigo-400 border border-indigo-500/30">
+                  <ArrowLeftRight className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Alter Room Assignment</h3>
+                  <p className="text-xs text-slate-400">Reallocate resident to another vacant room or check out.</p>
+                </div>
+              </div>
+              <button onClick={() => setShowReallocateModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800 mb-4 space-y-1">
+              <div className="text-xs font-bold text-white">{reallocatingResident.name}</div>
+              <div className="text-[11px] text-slate-400">Roll Number: {reallocatingResident.rollNumber}</div>
+              <div className="text-[11px] text-indigo-400 font-semibold">
+                Current Room: {currentRoomObj?.roomNumber || 'Unassigned'} ({currentRoomObj?.block || 'Main'})
+              </div>
+            </div>
+
+            <form onSubmit={handleReallocateRoom} className="space-y-4">
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Destination Room</label>
+                <select
+                  value={targetRoomId}
+                  onChange={(e) => setTargetRoomId(e.target.value)}
+                  className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                >
+                  <option value="">Select New Destination Room...</option>
+                  {rooms
+                    .filter(
+                      (r) =>
+                        r._id !== currentRoomObj?._id &&
+                        r.currentOccupancy < r.capacity &&
+                        r.status !== 'maintenance'
+                    )
+                    .map((r) => (
+                      <option key={r._id} value={r._id}>
+                        Room {r.roomNumber} ({r.block}, Floor {r.floor}) — {r.capacity - r.currentOccupancy} bed(s) available
+                      </option>
+                    ))}
+                  <option value="checkout" className="text-rose-400 font-semibold">
+                    Unassign & Check out to Awaiting Room Pool
+                  </option>
+                </select>
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowReallocateModal(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isReallocating}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 disabled:opacity-50"
+                >
+                  {isReallocating ? 'Reallocating...' : 'Confirm Reallocation'}
                 </button>
               </div>
             </form>

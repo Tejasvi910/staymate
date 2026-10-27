@@ -68,15 +68,10 @@ function PublicLanding() {
           <div className="flex items-center gap-3">
             <Link
               to="/login"
-              className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition"
+              className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 transition flex items-center gap-1.5"
             >
-              Sign In
-            </Link>
-            <Link
-              to="/register"
-              className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25 transition"
-            >
-              Student Register
+              <span>Portal Sign In</span>
+              <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
         </div>
@@ -111,12 +106,6 @@ function PublicLanding() {
               >
                 <span>Launch Role Portal</span>
                 <ArrowRight className="w-4 h-4" />
-              </Link>
-              <Link
-                to="/register"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-medium transition"
-              >
-                <span>Resident Student Sign Up</span>
               </Link>
             </div>
           </div>
@@ -202,14 +191,7 @@ export default function App() {
               </PublicAuthRoute>
             }
           />
-          <Route
-            path="/register"
-            element={
-              <PublicAuthRoute>
-                <Register />
-              </PublicAuthRoute>
-            }
-          />
+          <Route path="/register" element={<Navigate to="/login" replace />} />
 
           {/* Manager Protected Routes */}
           <Route

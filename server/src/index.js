@@ -12,6 +12,7 @@ import messRoutes from './routes/messRoutes.js';
 import noticeRoutes from './routes/noticeRoutes.js';
 import assistantRoutes from './routes/assistantRoutes.js';
 import campusRoutes from './routes/campusRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -92,6 +93,7 @@ app.get('/health', (req, res) => res.json({ status: 'OK' }));
 
 // Mount API Feature Routes (Primary /api prefix matching frontend expectations)
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/complaints', complaintRoutes);
 app.use('/api/mess', messRoutes);
@@ -101,6 +103,7 @@ app.use('/api/campuses', campusRoutes);
 
 // Resilient fallback mounts without '/api' prefix to prevent 404 if client strips /api
 app.use('/auth', authRoutes);
+app.use('/users', userRoutes);
 app.use('/rooms', roomRoutes);
 app.use('/complaints', complaintRoutes);
 app.use('/mess', messRoutes);

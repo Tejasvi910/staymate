@@ -8,10 +8,13 @@ import {
 } from '../controllers/roomController.js';
 import { protect, authorize } from '../middleware/authMiddleware.js';
 
+import { reassignStudentRoom } from '../controllers/userController.js';
+
 const router = express.Router();
 
 // Specific routes first to avoid route shadowing by :id
 router.get('/my-room', protect, getMyRoom);
+router.patch('/reassign', protect, authorize('manager', 'warden', 'admin'), reassignStudentRoom);
 
 // General room routes
 router

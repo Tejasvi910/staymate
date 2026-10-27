@@ -14,6 +14,10 @@ import {
   X,
   Loader2,
   Sparkles,
+  Trash2,
+  UserPlus,
+  Mail,
+  Key,
 } from 'lucide-react';
 
 export const ManagerCampuses = () => {
@@ -32,12 +36,36 @@ export const ManagerCampuses = () => {
   const [newCampusRooms, setNewCampusRooms] = useState('10');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Add Staff Modal State
+  // Add Campus Roster Staff Modal State (caretakers/security)
   const [showAddStaffModal, setShowAddStaffModal] = useState(false);
   const [staffName, setStaffName] = useState('');
   const [staffDesignation, setStaffDesignation] = useState('Hostel Caretaker');
   const [staffShift, setStaffShift] = useState('Morning (6 AM - 2 PM)');
   const [staffContact, setStaffContact] = useState('');
+
+  // Manager Staff Roster (Wardens & Accountants)
+  const [showManageStaffModal, setShowManageStaffModal] = useState(false);
+  const [staffList, setStaffList] = useState([]);
+  const [staffLoading, setStaffLoading] = useState(false);
+  const [showAddStaffAccountForm, setShowAddStaffAccountForm] = useState(false);
+  const [staffAccountName, setStaffAccountName] = useState('');
+  const [staffAccountEmail, setStaffAccountEmail] = useState('');
+  const [staffAccountRole, setStaffAccountRole] = useState('warden');
+  const [staffAccountCampus, setStaffAccountCampus] = useState('');
+  const [staffAccountContact, setStaffAccountContact] = useState('');
+  const [staffAccountPassword, setStaffAccountPassword] = useState('password123');
+
+  // Student Admission Modal
+  const [showAddStudentModal, setShowAddStudentModal] = useState(false);
+  const [studentName, setStudentName] = useState('');
+  const [studentEmail, setStudentEmail] = useState('');
+  const [studentRollNumber, setStudentRollNumber] = useState('');
+  const [studentCampus, setStudentCampus] = useState('');
+  const [studentRoom, setStudentRoom] = useState('');
+  const [studentContact, setStudentContact] = useState('');
+  const [studentTotalFee, setStudentTotalFee] = useState('60000');
+  const [studentPassword, setStudentPassword] = useState('password123');
+  const [isSubmittingStudent, setIsSubmittingStudent] = useState(false);
 
   // Fetch all campuses
   const fetchCampuses = async () => {
@@ -116,6 +144,104 @@ export const ManagerCampuses = () => {
     }
   };
 
+  // Staff Account Management Handlers (Wardens & Accountants)
+  const fetchStaffList = async () => {
+    setStaffLoading(true);
+    try {
+      const res = await api.get('/users/staff');
+      setStaffList(res.data.staff || []);
+    } catch (err) {
+      console.error('Failed to load staff list:', err);
+    } finally {
+      setStaffLoading(false);
+    }
+  };
+
+  const handleCreateStaffAccount = async (e) => {
+    e.preventDefault();
+    if (!staffAccountName || !staffAccountEmail || !staffAccountPassword) return;
+    try {
+      await api.post('/users/staff', {
+        name: staffAccountName.trim(),
+        email: staffAccountEmail.trim(),
+        password: staffAccountPassword.trim(),
+        role: staffAccountRole,
+        campus: staffAccountCampus || null,
+        contactNumber: staffAccountContact,
+      });
+      alert(`${staffAccountRole.toUpperCase()} account created successfully!`);
+      setShowAddStaffAccountForm(false);
+      setStaffAccountName('');
+      setStaffAccountEmail('');
+      setStaffAccountPassword('password123');
+      setStaffAccountContact('');
+      fetchStaffList();
+      fetchCampuses();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to create staff account');
+    }
+  };
+
+  const handleRemoveStaffAccount = async (staffId, sName) => {
+    if (!window.confirm(`Are you sure you want to remove staff account "${sName}"?`)) return;
+    try {
+      await api.delete(`/users/staff/${staffId}`);
+      alert('Staff member removed successfully');
+      fetchStaffList();
+      fetchCampuses();
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to remove staff member');
+    }
+  };
+
+  // Student Admission & Removal Handlers
+  const handleCreateStudent = async (e) => {
+    e.preventDefault();
+    if (!studentName || !studentEmail || !studentRollNumber) return;
+    setIsSubmittingStudent(true);
+    try {
+      await api.post('/users/student', {
+        name: studentName.trim(),
+        email: studentEmail.trim(),
+        rollNumber: studentRollNumber.trim(),
+        campus: studentCampus || selectedCampus?._id || null,
+        room: studentRoom || null,
+        contactNumber: studentContact,
+        totalFee: Number(studentTotalFee) || 60000,
+        password: studentPassword || 'password123',
+      });
+      alert(`Student ${studentName} admitted successfully!`);
+      setShowAddStudentModal(false);
+      setStudentName('');
+      setStudentEmail('');
+      setStudentRollNumber('');
+      setStudentContact('');
+      setStudentRoom('');
+      fetchCampuses();
+      if (selectedCampus) {
+        handleOpenCampus(selectedCampus);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to admit student');
+    } finally {
+      setIsSubmittingStudent(false);
+    }
+  };
+
+  const handleRemoveStudent = async (studentId, sName) => {
+    if (!window.confirm(`Are you sure you want to permanently remove student "${sName}" from the database?`)) return;
+    try {
+      await api.delete(`/users/student/${studentId}`);
+      alert(`Student "${sName}" was removed successfully.`);
+      fetchCampuses();
+      if (selectedCampus) {
+        handleOpenCampus(selectedCampus);
+      }
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to remove student');
+    }
+  };
+
   return (
     <div className="space-y-8">
       {/* Top Header */}
@@ -133,13 +259,37 @@ export const ManagerCampuses = () => {
           </p>
         </div>
 
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-sm shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02]"
-        >
-          <Plus className="w-4 h-4" />
-          <span>Add New Campus</span>
-        </button>
+        <div className="flex flex-wrap items-center gap-2.5">
+          <button
+            onClick={() => {
+              fetchStaffList();
+              setShowManageStaffModal(true);
+            }}
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold shadow-sm transition hover:scale-[1.02]"
+          >
+            <Shield className="w-4 h-4 text-amber-400" />
+            <span>Manage Staff & Wardens</span>
+          </button>
+
+          <button
+            onClick={() => {
+              setStudentCampus(campuses[0]?._id || '');
+              setShowAddStudentModal(true);
+            }}
+            className="inline-flex items-center gap-2 px-3.5 py-2.5 rounded-xl bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition hover:scale-[1.02]"
+          >
+            <UserPlus className="w-4 h-4 text-indigo-400" />
+            <span>+ Admit Student</span>
+          </button>
+
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs shadow-lg shadow-indigo-600/30 transition hover:scale-[1.02]"
+          >
+            <Plus className="w-4 h-4" />
+            <span>Add Campus</span>
+          </button>
+        </div>
       </div>
 
       {/* Loading & Error States */}
@@ -389,11 +539,25 @@ export const ManagerCampuses = () => {
 
                   {/* Room Allocation Table */}
                   <div className="rounded-xl border border-slate-800 bg-slate-950/40 p-5">
-                    <h4 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
-                      <Building2 className="w-4 h-4 text-indigo-400" />
-                      <span>Room Allotment & Residents</span>
-                    </h4>
-                    <p className="text-xs text-slate-400 mb-4">Current resident allocations in this campus.</p>
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+                      <div>
+                        <h4 className="text-sm font-bold text-white mb-1 flex items-center gap-2">
+                          <Building2 className="w-4 h-4 text-indigo-400" />
+                          <span>Room Allotment & Residents</span>
+                        </h4>
+                        <p className="text-xs text-slate-400">Current resident allocations and student records in this campus.</p>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setStudentCampus(selectedCampus._id);
+                          setShowAddStudentModal(true);
+                        }}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 text-xs font-semibold transition"
+                      >
+                        <UserPlus className="w-3.5 h-3.5" />
+                        <span>+ Admit Student to this Campus</span>
+                      </button>
+                    </div>
 
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-xs text-slate-300">
@@ -402,7 +566,7 @@ export const ManagerCampuses = () => {
                             <th className="py-2">Room</th>
                             <th className="py-2">Block</th>
                             <th className="py-2">Occupancy</th>
-                            <th className="py-2">Residents</th>
+                            <th className="py-2">Residents (Active Students)</th>
                             <th className="py-2">Status</th>
                           </tr>
                         </thead>
@@ -418,8 +582,22 @@ export const ManagerCampuses = () => {
                                 {rm.residents && rm.residents.length > 0 ? (
                                   <div className="flex flex-wrap gap-1.5">
                                     {rm.residents.map((res) => (
-                                      <span key={res._id} className="px-2 py-0.5 rounded-full bg-slate-800 text-slate-200 text-[10px]">
-                                        {res.name} ({res.rollNumber})
+                                      <span
+                                        key={res._id}
+                                        className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-200 text-[11px]"
+                                      >
+                                        <span className="font-medium">{res.name}</span>
+                                        <span className="text-[10px] text-slate-400">({res.rollNumber})</span>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleRemoveStudent(res._id, res.name);
+                                          }}
+                                          title="Remove student from system"
+                                          className="text-slate-500 hover:text-rose-400 transition ml-0.5"
+                                        >
+                                          <Trash2 className="w-3 h-3" />
+                                        </button>
                                       </span>
                                     ))}
                                   </div>
@@ -530,7 +708,7 @@ export const ManagerCampuses = () => {
         </div>
       )}
 
-      {/* Add Staff Modal */}
+      {/* Add Staff Modal (Caretakers & On-duty staff) */}
       {showAddStaffModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
           <div className="bg-slate-900 border border-slate-800 w-full max-w-md rounded-2xl p-6 shadow-2xl">
@@ -604,6 +782,335 @@ export const ManagerCampuses = () => {
                   className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30"
                 >
                   Save Staff Member
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* HQ Manage Staff & Wardens Modal */}
+      {showManageStaffModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-3xl max-h-[90vh] rounded-2xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-amber-500/10 rounded-xl text-amber-400 border border-amber-500/20">
+                  <Shield className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Staff & Wardens Administration</h3>
+                  <p className="text-xs text-slate-400">Add, view, and remove Wardens and Accountants across campuses.</p>
+                </div>
+              </div>
+              <button onClick={() => setShowManageStaffModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex items-center justify-between">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  Registered Staff Accounts ({staffList.length})
+                </h4>
+                <button
+                  onClick={() => setShowAddStaffAccountForm(!showAddStaffAccountForm)}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow transition"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>{showAddStaffAccountForm ? 'Close Form' : '+ Add Staff Account'}</span>
+                </button>
+              </div>
+
+              {/* Add Staff Account Form */}
+              {showAddStaffAccountForm && (
+                <form
+                  onSubmit={handleCreateStaffAccount}
+                  className="p-4 rounded-xl bg-slate-950/70 border border-indigo-500/30 space-y-4"
+                >
+                  <div className="text-xs font-bold text-indigo-300">Create New Staff Member</div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-300 mb-1">Full Name</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="e.g. Dr. Kanchan Verma"
+                        value={staffAccountName}
+                        onChange={(e) => setStaffAccountName(e.target.value)}
+                        className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-300 mb-1">Email Address</label>
+                      <input
+                        type="email"
+                        required
+                        placeholder="warden@hostel.in"
+                        value={staffAccountEmail}
+                        onChange={(e) => setStaffAccountEmail(e.target.value)}
+                        className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-300 mb-1">Role Hierarchy</label>
+                      <select
+                        value={staffAccountRole}
+                        onChange={(e) => setStaffAccountRole(e.target.value)}
+                        className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      >
+                        <option value="warden">Hostel Warden (Campus Administrator)</option>
+                        <option value="accountant">Campus Accountant (Financial Ledger)</option>
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-300 mb-1">Assigned Campus</label>
+                      <select
+                        value={staffAccountCampus}
+                        onChange={(e) => setStaffAccountCampus(e.target.value)}
+                        className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      >
+                        <option value="">Select Campus...</option>
+                        {campuses.map((c) => (
+                          <option key={c._id} value={c._id}>
+                            {c.name}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-300 mb-1">Contact Number</label>
+                      <input
+                        type="text"
+                        placeholder="+91 98765 43210"
+                        value={staffAccountContact}
+                        onChange={(e) => setStaffAccountContact(e.target.value)}
+                        className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-medium text-slate-300 mb-1">Initial Password</label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="password123"
+                        value={staffAccountPassword}
+                        onChange={(e) => setStaffAccountPassword(e.target.value)}
+                        className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="flex justify-end gap-2 pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowAddStaffAccountForm(false)}
+                      className="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 text-xs hover:bg-slate-700"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-3 py-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-semibold shadow"
+                    >
+                      Create Account
+                    </button>
+                  </div>
+                </form>
+              )}
+
+              {/* Staff Table */}
+              {staffLoading ? (
+                <div className="py-12 flex justify-center items-center text-slate-400 gap-2">
+                  <Loader2 className="w-5 h-5 animate-spin text-indigo-400" />
+                  <span className="text-xs">Loading staff records...</span>
+                </div>
+              ) : (
+                <div className="overflow-x-auto rounded-xl border border-slate-800">
+                  <table className="w-full text-left text-xs text-slate-300">
+                    <thead className="bg-slate-950/80 border-b border-slate-800 text-[10px] uppercase text-slate-400">
+                      <tr>
+                        <th className="py-2.5 px-3">Staff Member</th>
+                        <th className="py-2.5 px-3">Role</th>
+                        <th className="py-2.5 px-3">Campus</th>
+                        <th className="py-2.5 px-3">Contact</th>
+                        <th className="py-2.5 px-3 text-right">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 bg-slate-950/30">
+                      {staffList.map((st) => (
+                        <tr key={st._id} className="hover:bg-slate-900/40">
+                          <td className="py-2.5 px-3">
+                            <div className="font-semibold text-white">{st.name}</div>
+                            <div className="text-[10px] text-slate-400">{st.email}</div>
+                          </td>
+                          <td className="py-2.5 px-3">
+                            <span
+                              className={`px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase ${
+                                st.role === 'warden'
+                                  ? 'bg-amber-500/10 text-amber-300 border border-amber-500/20'
+                                  : st.role === 'accountant'
+                                  ? 'bg-emerald-500/10 text-emerald-300 border border-emerald-500/20'
+                                  : 'bg-indigo-500/10 text-indigo-300 border border-indigo-500/20'
+                              }`}
+                            >
+                              {st.role}
+                            </span>
+                          </td>
+                          <td className="py-2.5 px-3 text-slate-300">
+                            {st.campus?.name || <span className="text-slate-500 italic">Unassigned</span>}
+                          </td>
+                          <td className="py-2.5 px-3 text-slate-400">{st.contactNumber || '—'}</td>
+                          <td className="py-2.5 px-3 text-right">
+                            {st.role !== 'manager' ? (
+                              <button
+                                onClick={() => handleRemoveStaffAccount(st._id, st.name)}
+                                className="inline-flex items-center gap-1 px-2 py-1 rounded bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/20 text-[10px] font-semibold transition"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                                <span>Remove</span>
+                              </button>
+                            ) : (
+                              <span className="text-[10px] text-slate-500">Protected</span>
+                            )}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Admit Student Modal */}
+      {showAddStudentModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/85 backdrop-blur-sm">
+          <div className="bg-slate-900 border border-slate-800 w-full max-w-lg rounded-2xl p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-indigo-600/20 rounded-xl text-indigo-400 border border-indigo-500/30">
+                  <UserPlus className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Admit Resident Student</h3>
+                  <p className="text-xs text-slate-400">Register and create credentials for a new hostel resident.</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAddStudentModal(false)} className="text-slate-400 hover:text-white">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateStudent} className="space-y-3.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Student Full Name</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Tejasvi Raghuvanshi"
+                    value={studentName}
+                    onChange={(e) => setStudentName(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Roll / Admission Number</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. 2401530100155"
+                    value={studentRollNumber}
+                    onChange={(e) => setStudentRollNumber(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Campus Email</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="student@campus.edu"
+                    value={studentEmail}
+                    onChange={(e) => setStudentEmail(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Contact Phone</label>
+                  <input
+                    type="text"
+                    placeholder="+91 98765 00000"
+                    value={studentContact}
+                    onChange={(e) => setStudentContact(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Assigned Campus</label>
+                  <select
+                    value={studentCampus}
+                    onChange={(e) => setStudentCampus(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value="">Select Campus...</option>
+                    {campuses.map((c) => (
+                      <option key={c._id} value={c._id}>
+                        {c.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1">Annual Fee (INR)</label>
+                  <input
+                    type="number"
+                    placeholder="60000"
+                    value={studentTotalFee}
+                    onChange={(e) => setStudentTotalFee(e.target.value)}
+                    className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium text-slate-300 mb-1">Initial Password</label>
+                <input
+                  type="text"
+                  placeholder="password123"
+                  value={studentPassword}
+                  onChange={(e) => setStudentPassword(e.target.value)}
+                  className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddStudentModal(false)}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={isSubmittingStudent}
+                  className="px-4 py-2 text-xs font-semibold rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/30 disabled:opacity-50"
+                >
+                  {isSubmittingStudent ? 'Admitting...' : 'Admit Student'}
                 </button>
               </div>
             </form>

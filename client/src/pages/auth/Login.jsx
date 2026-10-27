@@ -185,15 +185,10 @@ export const Login = () => {
             </div>
           </form>
 
-          {/* Footer Note & Registration link */}
+          {/* Administrative Notice */}
           <div className="mt-6 pt-5 border-t border-slate-800/80 text-center text-xs text-slate-400">
-            <span>New resident student? </span>
-            <Link
-              to="/register"
-              className="font-semibold text-indigo-400 hover:text-indigo-300 underline underline-offset-4"
-            >
-              Create Resident Account
-            </Link>
+            <span>Student admissions & accounts are managed by your </span>
+            <span className="font-semibold text-indigo-400">Campus Warden & Administration</span>.
           </div>
         </div>
       </div>
