@@ -2,6 +2,7 @@
  * Catch undefined routes and forward a 404 error
  */
 export const notFound = (req, res, next) => {
+  console.warn(`[404] Resource Not Found: ${req.method} ${req.originalUrl}`);
   const error = new Error(`Resource Not Found: ${req.method} ${req.originalUrl}`);
   res.status(404);
   next(error);

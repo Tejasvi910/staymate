@@ -30,6 +30,13 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
+
+    // Log outgoing request target URL for transparent devtools auditing
+    const fullURL = config.url.startsWith('http')
+      ? config.url
+      : `${(config.baseURL || '').replace(/\/+$/, '')}/${config.url.replace(/^\/+/, '')}`;
+    console.log(`[StayMate API Request] ${config.method?.toUpperCase()} -> ${fullURL}`);
+
     return config;
   },
   (error) => {

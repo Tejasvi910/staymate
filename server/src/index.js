@@ -78,49 +78,19 @@ app.use(
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-// Root route
-app.get('/', (req, res) => {
-  res.json({
-    message: 'Welcome to StayMate AI API Server',
-    status: 'online',
-    version: '1.0.0',
-    documentation: '/api/health',
-    endpoints: {
-      auth: '/api/auth',
-      rooms: '/api/rooms',
-      complaints: '/api/complaints',
-      mess: '/api/mess',
-      notices: '/api/notices',
-      assistant: '/api/assistant',
-    },
-  });
+// Request logger to track incoming paths on Render/host
+app.use((req, res, next) => {
+  console.log(`[Incoming HTTP] ${req.method} ${req.originalUrl}`);
+  next();
 });
 
-// Health check route
-app.get('/api/health', (req, res) => {
-  const dbStates = {
-    0: 'disconnected',
-    1: 'connected',
-    2: 'connecting',
-    3: 'disconnecting',
-  };
+// Root, API Index, and Health Check Routes
+app.get('/', (req, res) => res.json({ status: 'API is running' }));
+app.get('/api', (req, res) => res.json({ status: 'API v1 root' }));
+app.get('/api/health', (req, res) => res.json({ status: 'OK' }));
+app.get('/health', (req, res) => res.json({ status: 'OK' }));
 
-  const currentDbState = dbStates[mongoose.connection.readyState] || 'unknown';
-
-  res.status(200).json({
-    status: 'healthy',
-    service: 'StayMate AI API Server',
-    timestamp: new Date().toISOString(),
-    uptime: `${Math.floor(process.uptime())}s`,
-    database: {
-      status: currentDbState,
-      name: mongoose.connection.name || 'staymate_ai',
-    },
-    environment: process.env.NODE_ENV || 'development',
-  });
-});
-
-// Mount API Feature Routes
+// Mount API Feature Routes (Primary /api prefix matching frontend expectations)
 app.use('/api/auth', authRoutes);
 app.use('/api/rooms', roomRoutes);
 app.use('/api/complaints', complaintRoutes);
@@ -128,6 +98,15 @@ app.use('/api/mess', messRoutes);
 app.use('/api/notices', noticeRoutes);
 app.use('/api/assistant', assistantRoutes);
 app.use('/api/campuses', campusRoutes);
+
+// Resilient fallback mounts without '/api' prefix to prevent 404 if client strips /api
+app.use('/auth', authRoutes);
+app.use('/rooms', roomRoutes);
+app.use('/complaints', complaintRoutes);
+app.use('/mess', messRoutes);
+app.use('/notices', noticeRoutes);
+app.use('/assistant', assistantRoutes);
+app.use('/campuses', campusRoutes);
 
 // 404 and Error Handling Middlewares
 app.use(notFound);
