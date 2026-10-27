@@ -101,9 +101,8 @@ export const Register = () => {
                   name="name"
                   value={formData.name}
                   onChange={handleChange}
-                  placeholder="e.g. Rahul Sharma"
                   required
-                  className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-950/70 border border-slate-700/70 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-950/70 border border-slate-700/70 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                 />
               </div>
             </div>
@@ -122,9 +121,8 @@ export const Register = () => {
                   name="email"
                   value={formData.email}
                   onChange={handleChange}
-                  placeholder="student@campus.edu"
                   required
-                  className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-950/70 border border-slate-700/70 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-950/70 border border-slate-700/70 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                 />
               </div>
             </div>
@@ -144,9 +142,8 @@ export const Register = () => {
                     name="rollNumber"
                     value={formData.rollNumber}
                     onChange={handleChange}
-                    placeholder="CS202501"
                     required
-                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm uppercase bg-slate-950/70 border border-slate-700/70 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm uppercase bg-slate-950/70 border border-slate-700/70 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                   />
                 </div>
               </div>
@@ -164,8 +161,7 @@ export const Register = () => {
                     name="contactNumber"
                     value={formData.contactNumber}
                     onChange={handleChange}
-                    placeholder="9876543210"
-                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-950/70 border border-slate-700/70 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                    className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-950/70 border border-slate-700/70 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                   />
                 </div>
               </div>
@@ -185,10 +181,9 @@ export const Register = () => {
                   name="password"
                   value={formData.password}
                   onChange={handleChange}
-                  placeholder="••••••••"
                   required
                   minLength={6}
-                  className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-950/70 border border-slate-700/70 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
+                  className="block w-full pl-10 pr-3.5 py-2.5 text-sm bg-slate-950/70 border border-slate-700/70 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition"
                 />
               </div>
             </div>

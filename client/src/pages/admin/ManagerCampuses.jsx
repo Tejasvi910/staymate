@@ -646,7 +646,6 @@ export const ManagerCampuses = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. LIET North Campus"
                   value={newCampusName}
                   onChange={(e) => setNewCampusName(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -658,7 +657,6 @@ export const ManagerCampuses = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Sector 62, Noida, UP"
                   value={newCampusAddress}
                   onChange={(e) => setNewCampusAddress(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -669,7 +667,6 @@ export const ManagerCampuses = () => {
                 <label className="block text-xs font-medium text-slate-300 mb-1">Hostel Blocks</label>
                 <input
                   type="text"
-                  placeholder="e.g. A-Wing, B-Wing, C-Wing"
                   value={newCampusBlocks}
                   onChange={(e) => setNewCampusBlocks(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -680,7 +677,6 @@ export const ManagerCampuses = () => {
                 <label className="block text-xs font-medium text-slate-300 mb-1">Total Rooms</label>
                 <input
                   type="number"
-                  placeholder="10"
                   value={newCampusRooms}
                   onChange={(e) => setNewCampusRooms(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -725,7 +721,6 @@ export const ManagerCampuses = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Vikram Sharma"
                   value={staffName}
                   onChange={(e) => setStaffName(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -737,7 +732,6 @@ export const ManagerCampuses = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Caretaker, Electrician, Security"
                   value={staffDesignation}
                   onChange={(e) => setStaffDesignation(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -762,7 +756,6 @@ export const ManagerCampuses = () => {
                 <label className="block text-xs font-medium text-slate-300 mb-1">Contact Number</label>
                 <input
                   type="text"
-                  placeholder="+91 98765 00000"
                   value={staffContact}
                   onChange={(e) => setStaffContact(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -835,7 +828,6 @@ export const ManagerCampuses = () => {
                       <input
                         type="text"
                         required
-                        placeholder="e.g. Dr. Kanchan Verma"
                         value={staffAccountName}
                         onChange={(e) => setStaffAccountName(e.target.value)}
                         className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -847,7 +839,6 @@ export const ManagerCampuses = () => {
                       <input
                         type="email"
                         required
-                        placeholder="warden@hostel.in"
                         value={staffAccountEmail}
                         onChange={(e) => setStaffAccountEmail(e.target.value)}
                         className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -886,7 +877,6 @@ export const ManagerCampuses = () => {
                       <label className="block text-[11px] font-medium text-slate-300 mb-1">Contact Number</label>
                       <input
                         type="text"
-                        placeholder="+91 98765 43210"
                         value={staffAccountContact}
                         onChange={(e) => setStaffAccountContact(e.target.value)}
                         className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -898,7 +888,6 @@ export const ManagerCampuses = () => {
                       <input
                         type="text"
                         required
-                        placeholder="password123"
                         value={staffAccountPassword}
                         onChange={(e) => setStaffAccountPassword(e.target.value)}
                         className="w-full px-3 py-2 text-xs bg-slate-900 border border-slate-700 rounded-lg text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -1016,7 +1005,6 @@ export const ManagerCampuses = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Tejasvi Raghuvanshi"
                     value={studentName}
                     onChange={(e) => setStudentName(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -1028,7 +1016,6 @@ export const ManagerCampuses = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 2401530100155"
                     value={studentRollNumber}
                     onChange={(e) => setStudentRollNumber(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -1040,7 +1027,6 @@ export const ManagerCampuses = () => {
                   <input
                     type="email"
                     required
-                    placeholder="student@campus.edu"
                     value={studentEmail}
                     onChange={(e) => setStudentEmail(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -1051,7 +1037,6 @@ export const ManagerCampuses = () => {
                   <label className="block text-xs font-medium text-slate-300 mb-1">Contact Phone</label>
                   <input
                     type="text"
-                    placeholder="+91 98765 00000"
                     value={studentContact}
                     onChange={(e) => setStudentContact(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -1078,7 +1063,6 @@ export const ManagerCampuses = () => {
                   <label className="block text-xs font-medium text-slate-300 mb-1">Annual Fee (INR)</label>
                   <input
                     type="number"
-                    placeholder="60000"
                     value={studentTotalFee}
                     onChange={(e) => setStudentTotalFee(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -1090,7 +1074,6 @@ export const ManagerCampuses = () => {
                 <label className="block text-xs font-medium text-slate-300 mb-1">Initial Password</label>
                 <input
                   type="text"
-                  placeholder="password123"
                   value={studentPassword}
                   onChange={(e) => setStudentPassword(e.target.value)}
                   className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"

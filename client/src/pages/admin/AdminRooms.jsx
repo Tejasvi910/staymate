@@ -196,10 +196,9 @@ export const AdminRooms = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. A-101"
                   value={createFormData.roomNumber}
                   onChange={(e) => setCreateFormData({ ...createFormData, roomNumber: e.target.value })}
-                  className="w-full px-4 py-2.5 text-sm uppercase bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-4 py-2.5 text-sm uppercase bg-slate-950 border border-slate-700/80 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 
@@ -301,10 +300,10 @@ export const AdminRooms = () => {
                   <Search className="w-4 h-4 absolute left-3 top-3 text-slate-500" />
                   <input
                     type="text"
-                    placeholder="Search by student name or roll number..."
+                    aria-label="Search registered students"
                     value={studentSearch}
                     onChange={(e) => setStudentSearch(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                    className="w-full pl-9 pr-3.5 py-2 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
 
@@ -339,13 +338,13 @@ export const AdminRooms = () => {
               </div>
 
               <div>
-                <span className="text-[11px] text-slate-500 font-semibold block text-center my-1">— OR ENTER ROLL NUMBER DIRECTLY —</span>
+                <label className="text-[11px] text-slate-400 font-semibold block text-center my-1">— OR ENTER ROLL NUMBER DIRECTLY —</label>
                 <input
                   type="text"
-                  placeholder="Roll Number (e.g. CS202501)"
+                  aria-label="Roll number"
                   value={rollNumberInput}
                   onChange={(e) => setRollNumberInput(e.target.value)}
-                  className="w-full px-3.5 py-2 text-xs uppercase bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  className="w-full px-3.5 py-2 text-xs uppercase bg-slate-950 border border-slate-700/80 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
                 />
               </div>
 

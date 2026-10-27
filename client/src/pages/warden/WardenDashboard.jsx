@@ -599,7 +599,6 @@ export const WardenDashboard = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 2401530100101"
                   value={studentRoll}
                   onChange={(e) => setStudentRoll(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -644,7 +643,6 @@ export const WardenDashboard = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Anand Prakash"
                   value={staffName}
                   onChange={(e) => setStaffName(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -656,7 +654,6 @@ export const WardenDashboard = () => {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Electrician / Plumber / Caretaker"
                   value={staffDesignation}
                   onChange={(e) => setStaffDesignation(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -681,7 +678,6 @@ export const WardenDashboard = () => {
                 <label className="block text-xs font-medium text-slate-300 mb-1">Contact Number</label>
                 <input
                   type="text"
-                  placeholder="+91 98765 43210"
                   value={staffContact}
                   onChange={(e) => setStaffContact(e.target.value)}
                   className="w-full px-3 py-2 text-sm bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-amber-500"
@@ -734,7 +730,6 @@ export const WardenDashboard = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Rahul Sharma"
                     value={studentName}
                     onChange={(e) => setStudentName(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -746,7 +741,6 @@ export const WardenDashboard = () => {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. 2401530100109"
                     value={studentRollNumber}
                     onChange={(e) => setStudentRollNumber(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -758,7 +752,6 @@ export const WardenDashboard = () => {
                   <input
                     type="email"
                     required
-                    placeholder="student@campus.edu"
                     value={studentEmail}
                     onChange={(e) => setStudentEmail(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -769,7 +762,6 @@ export const WardenDashboard = () => {
                   <label className="block text-xs font-medium text-slate-300 mb-1">Phone Number</label>
                   <input
                     type="text"
-                    placeholder="+91 98765 00000"
                     value={studentContact}
                     onChange={(e) => setStudentContact(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -798,7 +790,6 @@ export const WardenDashboard = () => {
                   <label className="block text-xs font-medium text-slate-300 mb-1">Annual Fee (INR)</label>
                   <input
                     type="number"
-                    placeholder="60000"
                     value={studentTotalFee}
                     onChange={(e) => setStudentTotalFee(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"
@@ -809,7 +800,6 @@ export const WardenDashboard = () => {
                   <label className="block text-xs font-medium text-slate-300 mb-1">Initial Password</label>
                   <input
                     type="text"
-                    placeholder="password123"
                     value={studentPassword}
                     onChange={(e) => setStudentPassword(e.target.value)}
                     className="w-full px-3 py-2 text-xs bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:ring-1 focus:ring-indigo-500"

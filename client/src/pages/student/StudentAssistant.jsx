@@ -219,12 +219,12 @@ export const StudentAssistant = () => {
         >
           <input
             type="text"
+            aria-label="Message StayMate AI Assistant"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Ask about curfews, today's dinner, room allocation, or laundry..."
             disabled={isTyping}
-            className="flex-1 bg-slate-900 border border-slate-700/80 rounded-2xl px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50"
+            className="flex-1 bg-slate-900 border border-slate-700/80 rounded-2xl px-4 py-3 text-sm text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 transition disabled:opacity-50"
           />
           <button
             type="submit"

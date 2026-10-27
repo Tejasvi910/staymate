@@ -361,7 +361,6 @@ export const AdminMess = () => {
               type="text"
               value={startTime}
               onChange={(e) => setStartTime(e.target.value)}
-              placeholder="e.g. 12:30 PM"
               className="w-full px-3.5 py-2 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-white"
             />
           </div>
@@ -371,7 +370,6 @@ export const AdminMess = () => {
               type="text"
               value={endTime}
               onChange={(e) => setEndTime(e.target.value)}
-              placeholder="e.g. 2:30 PM"
               className="w-full px-3.5 py-2 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-white"
             />
           </div>
@@ -386,10 +384,10 @@ export const AdminMess = () => {
           <form onSubmit={handleAddItem} className="flex gap-2">
             <input
               type="text"
+              aria-label="New dish name"
               value={newItemInput}
               onChange={(e) => setNewItemInput(e.target.value)}
-              placeholder="Add dish (e.g. Malai Kofta, Jeera Rice)..."
-              className="flex-1 px-4 py-2 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="flex-1 px-4 py-2 text-xs bg-slate-950 border border-slate-700/80 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <button
               type="submit"
